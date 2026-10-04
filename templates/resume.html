@@ -1,0 +1,82 @@
+{% extends "base.html" %} {% block content %}
+<div class="row g-5">
+  <aside class="col-lg-4">
+    <div class="side-sticky">
+      <div class="photo-frame">
+        <img
+          src="{{ url_for('static', filename='images/foto.jpg') }}"
+          alt="Фото: {{ profile.name }}"
+        />
+      </div>
+      <h1 class="display-name">{{ profile.name }}</h1>
+      <p class="role">{{ profile.position }}</p>
+      <a href="{{ url_for('contacts') }}" class="btn btn-accent">
+        Написати мені <i class="bi bi-arrow-right"></i>
+      </a>
+    </div>
+  </aside>
+
+  <div class="col-lg-8">
+    <section id="about" class="block">
+      <h2 class="block-title"><span class="num">01</span> Про себе</h2>
+      <p class="lead-text">{{ profile.summary }}</p>
+      <dl class="facts">
+        {% for label, value in personal %}
+        <dt>{{ label }}</dt>
+        <dd>{{ value }}</dd>
+        {% endfor %}
+      </dl>
+    </section>
+
+    <section id="education" class="block">
+      <h2 class="block-title"><span class="num">02</span> Освіта</h2>
+      {% for item in education %}
+      <article class="item-box">
+        <div
+          class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1"
+        >
+          <h3 class="item-title">{{ item.title }}</h3>
+          <span class="date-badge">{{ item.period }}</span>
+        </div>
+        <p class="mb-1">{{ item.place }}</p>
+        <p class="muted mb-0">{{ item.text }}</p>
+      </article>
+      {% endfor %}
+    </section>
+
+    <section id="skills" class="block">
+      <h2 class="block-title"><span class="num">03</span> Навички</h2>
+      {% for skill in skills %}
+      <span class="chip"><i class="bi bi-check2"></i> {{ skill }}</span>
+      {% endfor %}
+    </section>
+
+    <section id="technologies" class="block">
+      <h2 class="block-title"><span class="num">04</span> Технології</h2>
+      {% for tech in technologies %}
+      <span class="chip chip-line">{{ tech }}</span>
+      {% endfor %}
+    </section>
+
+    <section id="projects" class="block">
+      <h2 class="block-title">
+        <span class="num">05</span> Досвід роботи та проєкти
+      </h2>
+      {% for project in projects %}
+      <article class="item-box">
+        <div
+          class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-1"
+        >
+          <h3 class="item-title">{{ project.title }}</h3>
+          <span class="date-badge">{{ project.type }}</span>
+        </div>
+        <p class="muted">{{ project.text }}</p>
+        {% for tag in project.tags %}
+        <span class="tag">{{ tag }}</span>
+        {% endfor %}
+      </article>
+      {% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}
