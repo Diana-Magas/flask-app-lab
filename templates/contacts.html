@@ -1,0 +1,98 @@
+{% extends "base.html" %} {% block content %}
+<h1 class="page-title">{{ title }}</h1>
+<p class="lead-text mb-5">
+  Напишіть мені: відповім, щойно побачу повідомлення.
+</p>
+
+<div class="row g-5">
+  <div class="col-lg-5">
+    <section>
+      <h2 class="block-title"><span class="num">01</span> Дані</h2>
+      <address>
+        <div class="item-box contact-row">
+          <i class="bi bi-envelope"></i>
+          <a href="mailto:olena.student@example.com">magasdiana10@gmail.com</a>
+        </div>
+        <div class="item-box contact-row">
+          <i class="bi bi-telephone"></i> +380 (99) 049-25-06
+        </div>
+        <div class="item-box contact-row">
+          <i class="bi bi-geo-alt"></i>Івано-Франківськ, Україна
+        </div>
+      </address>
+
+      <h3 class="h6 mt-4">Я в мережі</h3>
+      <a
+        href="https://github.com/Diana-Magas/"
+        class="social-btn"
+        aria-label="GitHub"
+        ><i class="bi bi-github"></i
+      ></a>
+      <a
+        href="https://t.me/diandriivna"
+        class="social-btn"
+        aria-label="Telegram"
+        ><i class="bi bi-telegram"></i
+      ></a>
+    </section>
+  </div>
+
+  <div class="col-lg-7">
+    <section>
+      <h2 class="block-title"><span class="num">02</span> Повідомлення</h2>
+      <form method="post" action="{{ url_for('contacts') }}">
+        <div class="row">
+          <div class="col-md-6 mb-4">
+            <label for="name" class="form-label">Ім'я *</label>
+            <input
+              type="text"
+              class="form-control line-input"
+              id="name"
+              name="name"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-4">
+            <label for="email" class="form-label">Email *</label>
+            <input
+              type="email"
+              class="form-control line-input"
+              id="email"
+              name="email"
+              required
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <label for="subject" class="form-label">Тема</label>
+          <input
+            type="text"
+            class="form-control line-input"
+            id="subject"
+            name="subject"
+          />
+        </div>
+        <div class="mb-4">
+          <label for="message" class="form-label">Повідомлення *</label>
+          <textarea
+            class="form-control line-input"
+            id="message"
+            name="message"
+            rows="5"
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-accent">
+          Надіслати <i class="bi bi-arrow-right"></i>
+        </button>
+        <button type="reset" class="btn btn-link text-secondary">
+          Очистити
+        </button>
+      </form>
+      <p class="muted small mt-4">
+        Примітка: форма є заглушкою, повідомлення поки нікуди не надсилається.
+      </p>
+    </section>
+  </div>
+</div>
+{% endblock %}
