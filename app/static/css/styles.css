@@ -347,3 +347,16 @@ section {
     font-weight: 600;
     font-size: 24px;
 }
+
+.item-title a {
+    color: var(--chocolate);
+    text-decoration: none;
+}
+
+.item-title a:hover {
+    color: var(--denim-dark);
+}
+
+.date-badge {
+    font-size: 0.95rem;
+}
