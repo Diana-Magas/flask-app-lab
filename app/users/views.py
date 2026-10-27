@@ -1,4 +1,7 @@
-from flask import request, redirect, url_for, render_template, flash, session
+from flask import (
+    request, redirect, url_for, render_template,
+    flash, session, make_response, current_app,
+)
 from . import users_bp
 
 USERNAME = "diana"
@@ -50,8 +53,88 @@ def profile():
         flash("Спочатку увійдіть у систему!", "error")
         return redirect(url_for("users.login"))
 
+    session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
+
+    cookies = [
+        {"key": key, "value": value}
+        for key, value in request.cookies.items()
+        if key != session_cookie
+    ]
+
     return render_template(
         "users/profile.html",
         title="Профіль",
         username=session["username"],
+        cookies=cookies,
     )
+
+
+@users_bp.route("/profile/cookies/add", methods=["POST"])
+def add_cookie():
+    if "username" not in session:
+        flash("Спочатку увійдіть у систему!", "error")
+        return redirect(url_for("users.login"))
+
+    key = request.form.get("key", "").strip()
+    value = request.form.get("value", "")
+    seconds = request.form.get("seconds", "3600")
+    session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
+
+    if not key or key.lower() == session_cookie.lower():
+        flash("Вкажіть коректний ключ кукі!", "error")
+        return redirect(url_for("users.profile"))
+
+    try:
+        seconds = int(seconds)
+        if seconds < 1:
+            raise ValueError
+    except ValueError:
+        flash("Термін дії має бути додатним числом секунд!", "error")
+        return redirect(url_for("users.profile"))
+
+    response = make_response(redirect(url_for("users.profile")))
+    response.set_cookie(key, value, max_age=seconds, samesite="Lax")
+
+    flash(f"Кукі «{key}» успішно додано!", "success")
+    return response
+
+
+@users_bp.route("/profile/cookies/delete", methods=["POST"])
+def delete_cookie():
+    if "username" not in session:
+        flash("Спочатку увійдіть у систему!", "error")
+        return redirect(url_for("users.login"))
+
+    key = request.form.get("key", "").strip()
+    session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
+
+    if key == session_cookie:
+        flash("Не можна видалити кукі сесії цим способом!", "error")
+        return redirect(url_for("users.profile"))
+
+    if not key or key not in request.cookies:
+        flash("Кукі з таким ключем не знайдено!", "error")
+        return redirect(url_for("users.profile"))
+
+    response = make_response(redirect(url_for("users.profile")))
+    response.delete_cookie(key)
+
+    flash(f"Кукі «{key}» успішно видалено!", "success")
+    return response
+
+
+@users_bp.route("/profile/cookies/delete-all", methods=["POST"])
+def delete_all_cookies():
+    if "username" not in session:
+        flash("Спочатку увійдіть у систему!", "error")
+        return redirect(url_for("users.login"))
+
+    session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
+    response = make_response(redirect(url_for("users.profile")))
+
+    for key in request.cookies:
+        if key != session_cookie:
+            response.delete_cookie(key)
+
+    flash("Усі користувацькі кукі видалено!", "success")
+    return response
