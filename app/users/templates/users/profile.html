@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block title %}Профіль{% endblock %} {% block
+content %}
+<div class="profile-panel">
+  <div class="profile-banner">
+    <h1 class="h2">
+      Ласкаво просимо до сторінки
+      <i class="bi bi-people-fill"></i>
+      {{ username }}!
+    </h1>
+  </div>
+
+  <p>Тут ви можете отримати інформацію та вийти з системи.</p>
+
+  <form method="POST" action="{{ url_for('users.logout') }}">
+    <button type="submit" class="btn btn-danger">Вийти</button>
+  </form>
+</div>
+{% endblock %}
