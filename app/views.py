@@ -1,5 +1,14 @@
+import logging
 from flask import render_template, request, flash, redirect, url_for
 from . import app
+from .forms import ContactForm
+
+#логер для контактної форми 
+contact_logger = logging.getLogger("contact")
+contact_logger.setLevel(logging.INFO)
+_handler = logging.FileHandler("contacts.log", encoding="utf-8")
+_handler.setFormatter(logging.Formatter("%(asctime)s | %(message)s"))
+contact_logger.addHandler(_handler)
 
 
 @app.route('/')
@@ -72,10 +81,21 @@ def resume():
 
 @app.route("/contacts", methods=["GET", "POST"])
 def contacts():
-    if request.method == "POST":
-        flash("Дякуємо! Ваше повідомлення прийнято.", "success")
+    form = ContactForm()
+    if form.validate_on_submit():
+        try:
+            contact_logger.info(
+                "name=%s | email=%s | phone=%s | subject=%s | message=%s",
+                form.name.data, form.email.data, form.phone.data or "-",
+                form.subject.data, form.message.data.replace("\n", " "))
+            flash("Дякуємо! Ваше повідомлення прийнято і збережено.", "success")
+        except Exception as e:
+            app.logger.error(e)
+            flash("Не вдалося зберегти дані. Спробуйте пізніше.", "danger")
         return redirect(url_for("contacts"))
-    return render_template("contacts.html", title="Контакти")
+    if form.is_submitted() and form.errors:
+        flash("Форму не надіслано: виправте помилки в полях", "danger")
+    return render_template("contacts.html", title="Контакти", form=form)
 
 
 @app.route('/homepage')
