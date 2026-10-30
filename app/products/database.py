@@ -7,7 +7,7 @@ from tinydb import TinyDB, Query
 def _open():
     path = current_app.config["PRODUCTS_DB"]
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    return TinyDB(path, ensure_ascii=False, indent=2)
+    return TinyDB(path, ensure_ascii=False, indent=2, encoding="utf-8")
 
 
 def all_products():
@@ -30,7 +30,7 @@ def add_product(data):
 
 
 def update_product(product_id, data):
-    with _open() as db:      # id і created_at не передаємо, тому вони не змінюються
+    with _open() as db:
         db.table("products").update(data, Query().id == product_id)
 
 

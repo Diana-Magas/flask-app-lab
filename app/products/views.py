@@ -5,16 +5,16 @@ from . import products_bp
 from . import database as db
 from .forms import ProductForm, DeleteForm
 
-
 def save_image(file):
     ext = file.filename.rsplit(".", 1)[1].lower()
-    name = f"{uuid.uuid4().hex}.{ext}"                  
-    folder = current_app.config.get(
-        "UPLOAD_FOLDER", os.path.join(products_bp.static_folder, "uploads"))
-    os.makedirs(folder, exist_ok=True)
-    file.save(os.path.join(folder, name))
-    return f"uploads/{name}"                          
+    name = f"{uuid.uuid4().hex}.{ext}"
 
+    folder = os.path.join(current_app.static_folder, "uploads")
+    os.makedirs(folder, exist_ok=True)
+
+    file.save(os.path.join(folder, name))
+
+    return f"uploads/{name}"
 
 def form_to_data(form):
     return {"name": form.name.data,
