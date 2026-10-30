@@ -2,18 +2,38 @@
 content %}
 <h1 class="page-title mb-4">Products</h1>
 
+<a
+  href="{{ url_for('products.product_add') }}"
+  class="btn-accent d-inline-block text-decoration-none mb-4"
+  >+ Додати товар</a
+>
+
+{% if not products %}
+<p class="muted">Товарів поки немає.</p>
+{% endif %}
+
 <div class="row">
   {% for product in products %}
   <div class="col-md-4 mb-3">
     <div class="item-box h-100">
+      <img
+        class="img-fluid mb-3"
+        style="max-height: 160px; object-fit: cover"
+        src="{% if product.image %}{{ url_for('products.static', filename=product.image) }}{% else %}{{ url_for('static', filename='images/no-image.png') }}{% endif %}"
+        alt="{{ product.name }}"
+      />
       <h3 class="item-title mb-2">
         <a
           href="{{ url_for('products.product_detail', product_id=product.id) }}"
           >{{ product.name }}</a
         >
       </h3>
-      <span class="date-badge mb-2">${{ product.price }}</span>
-      <p class="muted mt-2 mb-3">{{ product.content }}</p>
+      <span class="date-badge mb-2">${{ '%.2f' % product.price }}</span>
+      <p class="muted small mb-1 mt-2">Категорія: {{ product.category }}</p>
+      <p class="muted small mb-1">Кількість: {{ product.quantity }}</p>
+      <p class="muted small mb-3">
+        Додано: {{ product.created_at.replace('T', ' ') }}
+      </p>
       <a
         class="btn-accent d-inline-block text-decoration-none"
         href="{{ url_for('products.product_detail', product_id=product.id) }}"

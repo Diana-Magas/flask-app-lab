@@ -1,0 +1,41 @@
+{% extends 'base.html' %} {% from '_render_field.html' import render_field %} {%
+block title %}{{ title }}{% endblock %} {% block content %}
+<h1 class="page-title mb-4">{{ title }}</h1>
+
+<div class="row">
+  <div class="col-lg-7">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {{ form.hidden_tag() }} {% for e in form.csrf_token.errors %}
+      <div class="text-danger small mb-3">{{ e }}</div>
+      {% endfor %} {{ render_field(form.name) }} {{ render_field(form.content)
+      }}
+
+      <div class="row">
+        <div class="col-md-6">{{ render_field(form.price, step="0.01") }}</div>
+        <div class="col-md-6">{{ render_field(form.quantity) }}</div>
+      </div>
+
+      {{ render_field(form.category) }} {{ render_field(form.image) }} {% if
+      product and product.image %}
+      <p class="muted small">
+        Поточне зображення (залишиться, якщо не вибрати нове):<br />
+        <img
+          src="{{ url_for('products.static', filename=product.image) }}"
+          height="80"
+          alt="{{ product.name }}"
+        />
+      </p>
+      {% endif %}
+
+      <button type="submit" class="btn btn-accent">
+        {{ 'Зберегти зміни' if product else 'Додати товар' }}
+      </button>
+      <a
+        href="{{ url_for('products.product_list') }}"
+        class="btn btn-link text-secondary"
+        >Скасувати</a
+      >
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -3,13 +3,39 @@ block content %}
 <h1 class="page-title mb-3">{{ product.name }}</h1>
 
 <div class="item-box">
-  <span class="date-badge mb-3">${{ product.price }}</span>
-  <p class="lead-text mb-0">{{ product.content }}</p>
+  <img
+    class="img-fluid mb-3"
+    style="max-height: 300px; object-fit: cover"
+    src="{% if product.image %}{{ url_for('products.static', filename=product.image) }}{% else %}{{ url_for('static', filename='images/no-image.png') }}{% endif %}"
+    alt="{{ product.name }}"
+  />
+  <span class="date-badge mb-3">${{ '%.2f' % product.price }}</span>
+  <p class="lead-text mb-3">{{ product.content }}</p>
+  <p class="muted small mb-1">Категорія: {{ product.category }}</p>
+  <p class="muted small mb-1">Кількість: {{ product.quantity }}</p>
+  <p class="muted small mb-0">
+    Додано: {{ product.created_at.replace('T', ' ') }}
+  </p>
 </div>
 
-<a
-  class="btn-accent d-inline-block text-decoration-none mt-3"
-  href="{{ url_for('products.product_list') }}"
-  >← Back to products</a
->
+<div class="mt-3 d-flex flex-wrap gap-2 align-items-center">
+  <a
+    class="btn-accent d-inline-block text-decoration-none"
+    href="{{ url_for('products.product_list') }}"
+    >← Back to products</a
+  >
+  <a
+    class="btn-accent d-inline-block text-decoration-none"
+    href="{{ url_for('products.product_edit', product_id=product.id) }}"
+    >Редагувати</a
+  >
+  <form
+    method="post"
+    action="{{ url_for('products.product_delete', product_id=product.id) }}"
+    onsubmit="return confirm('Видалити товар?');"
+  >
+    {{ delete_form.hidden_tag() }}
+    <button type="submit" class="btn btn-outline-danger">Видалити</button>
+  </form>
+</div>
 {% endblock %}
