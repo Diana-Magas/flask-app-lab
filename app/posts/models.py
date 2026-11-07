@@ -19,6 +19,10 @@ class Post(db.Model):
     category: Mapped[Optional[str]] = mapped_column(
         sa.Enum('news', 'publication', 'tech', 'other', name='post_category')
     )
+    is_active: Mapped[bool] = mapped_column(default=True, server_default=sa.true())
+    author: Mapped[str] = mapped_column(
+        sa.String(20), default='Anonymous', server_default='Anonymous'
+    )
 
     def __repr__(self):
         return f'<Post(title={self.title})>'
