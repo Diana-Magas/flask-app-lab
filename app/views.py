@@ -1,9 +1,9 @@
 import logging
-from flask import render_template, request, flash, redirect, url_for
-from . import app
+from flask import (render_template, request, flash,
+                   redirect, url_for, current_app)
 from .forms import ContactForm
 
-#логер для контактної форми 
+# логер для контактної форми
 contact_logger = logging.getLogger("contact")
 contact_logger.setLevel(logging.INFO)
 _handler = logging.FileHandler("contacts.log", encoding="utf-8")
@@ -11,14 +11,13 @@ _handler.setFormatter(logging.Formatter("%(asctime)s | %(message)s"))
 contact_logger.addHandler(_handler)
 
 
-@app.route('/')
-@app.route("/resume")
 def resume():
     profile = {
         "name": "Діана Магас",
         "position": "Junior Full-Stack Developer / Студентка",
         "summary": "Студентка спеціальності «Інженерія програмного забезпечення». "
-                   "Захоплююся розробкою вебдодатків на Laravel. Створюю сучасні та зручні вебрішення , прагну розвиватися, вчитися новому та втіпювати цікаві ідеї в реальність",
+                   "Захоплююся розробкою вебдодатків на Laravel. Створюю сучасні та зручні вебрішення, "
+                   "прагну розвиватися, вчитися новому та втілювати цікаві ідеї в реальність",
     }
 
     personal = [
@@ -34,8 +33,8 @@ def resume():
          "text": "Кваліфікація: технік-програміст, веб-програміст."},
 
         {"title": "Інженерія програмного забезпечення", "period": "2025 - теперішній час",
-         "place": "Карпатського національного університет ім. Василя Стефаника",
-         "text": "Розробка вебзастосунків, програмування, робота з базами даних сучасними вебтехнологіями.."},
+         "place": "Карпатський національний університет ім. Василя Стефаника",
+         "text": "Розробка вебзастосунків, програмування, робота з базами даних, сучасні вебтехнології."},
 
         {"title": "Pre-Junior Program", "period": "01.03.2024-10.05.2024",
          "place": "EPAM",
@@ -56,19 +55,22 @@ def resume():
         {
             "title": "FinLex Alliance — юридично-бухгалтерський вебсайт", "period": "2025 - теперішній час",
             "type": "Комерційний проєкт",
-            "text": "Розробка вебсайту для юридичних та бухгалтерських послуг з адміністративною панеллю, керуванням послугами, контентом і контактними заявками.",
+            "text": "Розробка вебсайту для юридичних та бухгалтерських послуг з адміністративною панеллю, "
+                    "керуванням послугами, контентом і контактними заявками.",
             "tags": ["Laravel", "PHP", "React", "Inertia.js", "PostgreSQL", "Filament"]
         },
         {
-            "title": "Travel.Pro — туристичний вебсайт", "period": " серпень 2026 - теперішній час",
+            "title": "Travel.Pro — туристичний вебсайт", "period": "серпень 2026 - теперішній час",
             "type": "Комерційний проєкт",
-            "text": "Розробка вебсайту туристичної агенції з каталогом турів, категоріями, інформаційними сторінками та адміністративною панеллю для керування контентом.",
+            "text": "Розробка вебсайту туристичної агенції з каталогом турів, категоріями, "
+                    "інформаційними сторінками та адміністративною панеллю для керування контентом.",
             "tags": ["Laravel", "PHP", "React", "Inertia.js", "PostgreSQL", "Filament"]
         },
         {
             "title": "Практика / стажування",
             "type": "Практичний досвід",
-            "text": "Виконання практичних завдань з веброзробки, робота з існуючим кодом, Git та командна взаємодія під час розробки вебпроєктів.",
+            "text": "Виконання практичних завдань з веброзробки, робота з існуючим кодом, "
+                    "Git та командна взаємодія під час розробки вебпроєктів.",
             "tags": ["PHP", "Laravel", "Git", "Web Development"]
         }
     ]
@@ -79,7 +81,6 @@ def resume():
                            projects=projects)
 
 
-@app.route("/contacts", methods=["GET", "POST"])
 def contacts():
     form = ContactForm()
     if form.validate_on_submit():
@@ -90,7 +91,7 @@ def contacts():
                 form.subject.data, form.message.data.replace("\n", " "))
             flash("Дякуємо! Ваше повідомлення прийнято і збережено.", "success")
         except Exception as e:
-            app.logger.error(e)
+            current_app.logger.error(e)
             flash("Не вдалося зберегти дані. Спробуйте пізніше.", "danger")
         return redirect(url_for("contacts"))
     if form.is_submitted() and form.errors:
@@ -98,10 +99,7 @@ def contacts():
     return render_template("contacts.html", title="Контакти", form=form)
 
 
-@app.route('/homepage')
 def home():
     """View for the Home page of your website."""
-
     agent = request.user_agent
-
     return render_template("homepage.html", title="Home", agent=agent)

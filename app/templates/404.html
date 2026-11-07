@@ -1,0 +1,17 @@
+{% extends "base.html" %} {% block content %}
+<div class="container text-center py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <h1 class="display-1 fw-bold" style="color: var(--denim-dark)">404</h1>
+      <h2 class="page-title mb-3">Сторінку не знайдено</h2>
+      <p class="muted lead-text mb-4">
+        Вибачте, але сторінка, яку ви намагаєтеся знайти, не існує або була
+        переміщена.
+      </p>
+      <a href="{{ url_for('resume') }}" class="btn btn-accent">
+        Повернутися на головну
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

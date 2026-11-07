@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block content %}
+<div class="container mt-4">
+  <h2>{{ post.title }}</h2>
+  <small class="text-muted"
+    >Створено: {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</small
+  >
+  <hr />
+  <p>{{ post.content }}</p>
+
+  <a
+    href="{{ url_for('posts.update_post', id=post.id) }}"
+    class="btn btn-secondary"
+    >Редагувати</a
+  >
+
+  <form
+    action="{{ url_for('posts.delete_post', id=post.id) }}"
+    method="POST"
+    class="d-inline"
+  >
+    <button
+      type="submit"
+      class="btn btn-danger"
+      onclick="return confirm('Ви впевнені?');"
+    >
+      Видалити
+    </button>
+  </form>
+
+  <br /><br />
+  <a href="{{ url_for('posts.index') }}" class="btn btn-link"
+    >Назад до списку</a
+  >
+</div>
+{% endblock %}

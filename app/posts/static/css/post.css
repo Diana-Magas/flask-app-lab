@@ -1,0 +1,55 @@
+.post-card {
+    background: var(--warm-gray);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--denim);
+    border-radius: 6px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(62, 42, 32, 0.08);
+}
+
+.post-title-link {
+    color: var(--chocolate);
+    text-decoration: none;
+}
+
+.post-title-link:hover {
+    color: var(--denim-dark);
+}
+
+.post-meta {
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.post-content-preview {
+    color: #3a322c;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.post-detail-container {
+    background: var(--warm-gray);
+    border-radius: 8px;
+    padding: 30px;
+    border: 1px solid var(--line);
+    margin-top: 20px;
+}
+
+.post-detail-title {
+    font-family: "Fraunces", Georgia, serif;
+    color: var(--chocolate);
+    font-weight: 700;
+}
+
+.post-actions {
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
