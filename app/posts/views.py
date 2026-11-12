@@ -18,23 +18,29 @@ def all_posts():
 @post_bp.route('/create', methods=['GET', 'POST'])
 def add_post():
     form = PostForm()
+
     if form.validate_on_submit():
-        post = Post(
-            title=form.title.data,
-            content=form.content.data,
-            is_active=form.is_active.data,
-            posted=form.publish_date.data,
-            category=form.category.data,
-            author=(session.get('username') or 'Anonymous')[:20],
-        )
+        post = Post()
+        form.populate_obj(post)
+
+        post.posted = form.publish_date.data
+        post.author = (session.get('username') or 'Anonymous')[:20]
+
         db.session.add(post)
         db.session.commit()
+
         flash(f"Post '{post.title}' has been added.", 'success')
         return redirect(url_for('posts.all_posts'))
+
     if request.method == 'POST':
         flash('Enter the correct data in the form!', 'danger')
-    return render_template('add_post.html', form=form,
-                           title='Новий пост', heading='Create a New Post')
+
+    return render_template(
+        'add_post.html',
+        form=form,
+        title='Новий пост',
+        heading='Create a New Post'
+    )
 
 
 @post_bp.route('/<int:id>')
@@ -47,28 +53,40 @@ def detail_post(id):
 def update_post(id):
     post = db.get_or_404(Post, id)
     form = PostForm(obj=post)
+
     if request.method == 'GET':
-        form.publish_date.data = post.posted   # назви полів різні
+        form.publish_date.data = post.posted
+
     if form.validate_on_submit():
-        post.title = form.title.data
-        post.content = form.content.data
-        post.is_active = form.is_active.data
-        post.category = form.category.data
+        form.populate_obj(post)
         post.posted = form.publish_date.data
+
         db.session.commit()
+
         flash('Post updated.', 'success')
         return redirect(url_for('posts.detail_post', id=post.id))
-    return render_template('add_post.html', form=form,
-                           title='Редагування', heading='Edit Post')
+
+    return render_template(
+        'add_post.html',
+        form=form,
+        title='Редагування',
+        heading='Edit Post'
+    )
 
 
 @post_bp.route('/<int:id>/delete', methods=['GET', 'POST'])
 def delete_post(id):
     post = db.get_or_404(Post, id)
+
     if request.method == 'POST':
         db.session.delete(post)
         db.session.commit()
+
         flash('Post deleted.', 'danger')
         return redirect(url_for('posts.all_posts'))
-    return render_template('delete_confirm.html', post=post,
-                           title='Підтвердження видалення')
+
+    return render_template(
+        'delete_confirm.html',
+        post=post,
+        title='Підтвердження видалення'
+    )
