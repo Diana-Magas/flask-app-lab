@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -26,6 +25,9 @@ def create_app(config_name='development'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
+    # Крок 13: розкоментуйте перед db.init_app(app)
+    # app.config["SQLALCHEMY_ECHO"] = True
+
     db.init_app(app)
     migrate.init_app(app, db)
 
@@ -42,14 +44,15 @@ def create_app(config_name='development'):
 
     from .users import users_bp
     app.register_blueprint(users_bp)
+    from .users.models import User
 
     from .products import products_bp
     app.register_blueprint(products_bp)
-
     from .products.models import Product
 
     from .posts import post_bp
     app.register_blueprint(post_bp, url_prefix='/post')
+    from .posts.models import Post, Tag
 
     @app.errorhandler(404)
     def not_found(e):

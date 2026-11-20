@@ -2,7 +2,8 @@ from datetime import datetime
 
 from flask_wtf import FlaskForm
 from wtforms import (StringField, TextAreaField, BooleanField,
-                     DateTimeLocalField, SelectField, SubmitField)
+                     DateTimeLocalField, SelectField, SelectMultipleField,
+                     SubmitField)
 from wtforms.validators import DataRequired, Length
 
 CATEGORIES = [
@@ -22,4 +23,6 @@ class PostForm(FlaskForm):
                                       default=datetime.now)
     category = SelectField('Category', choices=CATEGORIES,
                            validators=[DataRequired()])
+    author_id = SelectField("Author", coerce=int)
+    tags = SelectMultipleField("Tags", coerce=int)
     submit = SubmitField('Submit')
