@@ -4,6 +4,7 @@ from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
 
 from .config import config
 
@@ -21,6 +22,8 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 bcrypt = Bcrypt()
+login_manager = LoginManager()
+
 
 def create_app(config_name='development'):
     app = Flask(__name__)
@@ -32,7 +35,12 @@ def create_app(config_name='development'):
     db.init_app(app)
     migrate.init_app(app, db)
     bcrypt.init_app(app)
-    
+    login_manager.init_app(app)
+
+    login_manager.login_view = 'users.login'
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'warning'
+
     from . import views
     app.add_url_rule('/', endpoint='resume', view_func=views.resume)
     app.add_url_rule('/resume', endpoint='resume', view_func=views.resume)

@@ -1,16 +1,18 @@
-
 from flask import (
     request, redirect, url_for, render_template,
-    flash, session, make_response, current_app,
+    flash, make_response, current_app,
+)
+from flask_login import (
+    login_user, logout_user, login_required, current_user
 )
 
-from . import users_bp
 from app import db
+from . import users_bp
 from .forms import RegistrationForm, LoginForm
 from .models import User
 
 
-@users_bp.route("/hi/<string:name>")
+@users_bp.route("/hi/<string:name>")   # /users/hi/diana?age=20
 def greetings(name):
     name = name.upper()
     age = request.args.get("age", None, int)
@@ -27,84 +29,65 @@ def admin():
 
 @users_bp.route("/register", methods=["GET", "POST"])
 def register():
-    form = RegistrationForm()
+    if current_user.is_authenticated:
+        return redirect(url_for("users.account"))
 
+    form = RegistrationForm()
     if form.validate_on_submit():
         user = User(
             username=form.username.data,
             email=form.email.data,
             password=User.hash_password(form.password.data),
         )
-
         db.session.add(user)
         db.session.commit()
-
         flash(f"Account created for {form.username.data}!", "success")
         return redirect(url_for("users.login"))
-
     return render_template("users/register.html", form=form, title="Register")
 
 
 @users_bp.route("/login", methods=["GET", "POST"])
 def login():
-    if "username" in session:
+    if current_user.is_authenticated:
         return redirect(url_for("users.account"))
 
     form = LoginForm()
-
     if form.validate_on_submit():
         user = db.session.scalar(
             db.select(User).where(User.email == form.email.data)
         )
-
         if user and user.check_password(form.password.data):
-            session["username"] = user.username
-            flash(f"Вітаю, {user.username}! Вхід успішний", "success")
+            login_user(user, remember=form.remember.data)
+            flash("You logged in successfully!", "success")
             return redirect(url_for("users.account"))
-
         flash("Error: Invalid email or password.", "danger")
-
     return render_template("users/login.html", form=form, title="Вхід")
 
 
 @users_bp.route("/account")
+@login_required
 def account():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
-    user = db.session.scalar(
-        db.select(User).where(User.username == session["username"])
-    )
-
-    return render_template("users/account.html", user=user, title="Account")
+    return render_template("users/account.html", user=current_user,
+                           title="Account")
 
 
 @users_bp.route("/list")
+@login_required
 def users_list():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     users = db.session.scalars(db.select(User).order_by(User.id)).all()
-
     return render_template("users/users_list.html", users=users, title="Users")
 
 
 @users_bp.route("/logout", methods=["POST"])
 def logout():
-    session.pop("username", None)
-    flash("Ви успішно вийшли із системи.", "success")
-
+    logout_user()
+    flash("You have successfully logged out.", "info")
     return redirect(url_for("users.login"))
 
 
 @users_bp.route("/profile")
+@login_required
 def profile():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
 
     cookies = [
@@ -114,29 +97,24 @@ def profile():
     ]
 
     theme = request.cookies.get("theme", "light")
-
     if theme not in ("light", "dark"):
         theme = "light"
 
     return render_template(
         "users/profile.html",
         title="Профіль",
-        username=session["username"],
+        username=current_user.username,
         cookies=cookies,
         theme=theme,
     )
 
 
 @users_bp.route("/profile/cookies/add", methods=["POST"])
+@login_required
 def add_cookie():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     key = request.form.get("key", "").strip()
     value = request.form.get("value", "")
     seconds = request.form.get("seconds", "3600")
-
     session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
 
     if not key or key.lower() == session_cookie.lower():
@@ -145,10 +123,8 @@ def add_cookie():
 
     try:
         seconds = int(seconds)
-
         if seconds < 1:
             raise ValueError
-
     except ValueError:
         flash("Термін дії має бути додатним числом секунд!", "error")
         return redirect(url_for("users.profile"))
@@ -157,16 +133,12 @@ def add_cookie():
     response.set_cookie(key, value, max_age=seconds, samesite="Lax")
 
     flash(f"Кукі «{key}» успішно додано!", "success")
-
     return response
 
 
 @users_bp.route("/profile/cookies/delete", methods=["POST"])
+@login_required
 def delete_cookie():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     key = request.form.get("key", "").strip()
     session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
 
@@ -182,16 +154,12 @@ def delete_cookie():
     response.delete_cookie(key)
 
     flash(f"Кукі «{key}» успішно видалено!", "success")
-
     return response
 
 
 @users_bp.route("/profile/cookies/delete-all", methods=["POST"])
+@login_required
 def delete_all_cookies():
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     session_cookie = current_app.config.get("SESSION_COOKIE_NAME", "session")
     response = make_response(redirect(url_for("users.profile")))
 
@@ -200,22 +168,17 @@ def delete_all_cookies():
             response.delete_cookie(key)
 
     flash("Усі користувацькі кукі видалено!", "success")
-
     return response
 
 
 @users_bp.route("/profile/theme/<string:theme>")
+@login_required
 def change_theme(theme):
-    if "username" not in session:
-        flash("Спочатку увійдіть у систему!", "error")
-        return redirect(url_for("users.login"))
-
     if theme not in ("light", "dark"):
         flash("Невідома кольорова схема!", "error")
         return redirect(url_for("users.profile"))
 
     response = make_response(redirect(url_for("users.profile")))
-
     response.set_cookie(
         "theme",
         theme,
@@ -224,5 +187,4 @@ def change_theme(theme):
     )
 
     flash("Кольорову схему змінено!", "success")
-
     return response
