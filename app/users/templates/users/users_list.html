@@ -1,0 +1,29 @@
+{% extends 'base.html' %} {% block content %}
+<h2 class="page-title mb-4" style="font-size: 2rem">
+  Users List ({{ users|length }})
+</h2>
+
+{% if users %}
+<div class="table-responsive">
+  <table class="table table-bordered align-middle">
+    <thead>
+      <tr>
+        <th style="background: var(--denim); color: #fff">Id</th>
+        <th style="background: var(--denim); color: #fff">Username</th>
+        <th style="background: var(--denim); color: #fff">Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="alert alert-info">Зареєстрованих користувачів поки немає.</div>
+{% endif %} {% endblock %}

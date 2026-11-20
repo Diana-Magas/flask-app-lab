@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% block css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/auth.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="card auth-card">
+  <div class="card-body">
+    <h3 class="mb-2">Welcome, {{ user.username }}!</h3>
+    <p class="mb-1">You have successfully logged in to your profile.</p>
+    <p class="muted mb-0">Email: {{ user.email }}</p>
+  </div>
+  <div class="card-footer d-flex gap-2">
+    <a
+      href="{{ url_for('users.users_list') }}"
+      class="btn btn-outline-secondary btn-sm"
+      >Users</a
+    >
+    <form method="POST" action="{{ url_for('users.logout') }}" class="m-0">
+      <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
