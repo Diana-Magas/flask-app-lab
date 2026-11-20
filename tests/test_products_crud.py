@@ -3,7 +3,8 @@ import shutil
 import tempfile
 import unittest
 
-from app import app
+from app import create_app
+app = create_app('testing')
 from app.products import database as db
 
 
