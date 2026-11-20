@@ -4,6 +4,10 @@ from flask import (
 )
 from . import users_bp
 
+from app import db, bcrypt
+from .forms import RegistrationForm
+from .models import User
+
 USERNAME = "diana"
 PASSWORD = "12345"
 
@@ -22,7 +26,25 @@ def admin():
     print(to_url)
     return redirect(to_url)
 
+@users_bp.route("/register", methods=["GET", "POST"])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = bcrypt.generate_password_hash(
+            form.password.data
+        ).decode('utf-8')
+        user = User(
+            username=form.username.data,
+            email=form.email.data,
+            password=hashed_password,
+        )
+        db.session.add(user)
+        db.session.commit()
+        flash(f'Account created for {form.username.data}!', 'success')
+        return redirect(url_for('users.login'))
+    return render_template('users/register.html', form=form, title='Register')
 
+    
 @users_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":

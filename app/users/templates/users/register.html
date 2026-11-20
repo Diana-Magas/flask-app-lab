@@ -1,0 +1,25 @@
+{% extends 'base.html' %} {% from 'macros/form_macros.html' import render_field
+%} {% block css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/auth.css') }}"
+/>
+{% endblock %} {% block content %}
+<div class="card auth-card">
+  <div class="card-header">
+    <h3>Реєстрація</h3>
+    <p class="muted small mb-0">Створіть акаунт, щоб продовжити</p>
+  </div>
+  <div class="card-body">
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }} {{ render_field(form.username) }} {{
+      render_field(form.email) }} {{ render_field(form.password) }} {{
+      render_field(form.confirm_password) }} {{ form.submit(class="btn
+      btn-accent") }}
+    </form>
+  </div>
+  <div class="card-footer">
+    Вже є акаунт? <a href="{{ url_for('users.login') }}">Увійти</a>
+  </div>
+</div>
+{% endblock %}
